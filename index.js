@@ -3,7 +3,9 @@ const { connectDB } = require("./configs/connectDB");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
 const { reqLogger, errorLogger } = require("./middlewares/logger");
+const { corsOptions } = require("./configs/corsOptions");
 require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
 connectDB();
@@ -11,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(reqLogger);
 
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
