@@ -31,6 +31,7 @@ const signinUser = async (req, res) => {
     user.refreshToken = refreshToken;
 
     await user.save();
+    res.cookie("jwt", refreshToken, { maxAge: 86400000, httpOnly: true });
 
     res.status(200).json({ accessToken });
   } catch (error) {
