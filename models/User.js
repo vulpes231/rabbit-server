@@ -1,3 +1,4 @@
+const { format } = require("date-fns");
 const { default: mongoose } = require("mongoose");
 
 const Schema = mongoose.Schema;
@@ -18,6 +19,18 @@ const userSchema = new Schema({
   refreshToken: {
     type: String,
     default: null,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  orders: {
+    type: Number,
+    default: 0,
+  },
+  earnedXP: {
+    type: Number,
+    default: 0,
   },
 });
 

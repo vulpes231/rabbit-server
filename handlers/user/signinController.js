@@ -33,7 +33,7 @@ const signinUser = async (req, res) => {
     await user.save();
     res.cookie("jwt", refreshToken, { maxAge: 86400000, httpOnly: true });
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ accessToken, user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error, Try again later" });
