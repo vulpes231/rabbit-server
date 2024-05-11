@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 const signupUser = async (req, res) => {
   const { member, pass, mail } = req.body;
-  // console.log(req.body);
+  console.log(req.body);
   if (!member || !pass || !mail)
     return res.status(400).json({ message: "bad request!" });
 
