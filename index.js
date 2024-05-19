@@ -20,8 +20,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 // endpoints
-
-app.use("/products", require("./routes/user/product"));
 app.use("/signin", require("./routes/user/signin"));
 app.use("/signup", require("./routes/user/signup"));
 app.use("/", require("./routes/root"));
@@ -29,6 +27,7 @@ app.use("/", require("./routes/root"));
 app.use(verifyJWT);
 app.use("/users", require("./routes/user/user"));
 app.use("/logout", require("./routes/user/logout"));
+app.use("/products", require("./routes/user/product"));
 
 app.use(errorLogger);
 
