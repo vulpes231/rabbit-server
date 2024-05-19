@@ -10,7 +10,7 @@ const itemSchema = new Schema({
   info: {
     type: String,
   },
-  group: {
+  category: {
     type: String,
   },
   price: {

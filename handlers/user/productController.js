@@ -19,8 +19,8 @@ const createNewProduct = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const { name, info, price, group } = req.body;
-  if (!name || !info || !price)
+  const { name, info, price, category } = req.body;
+  if (!name || !info || !price || !category)
     return res
       .status(400)
       .json({ message: "Name, info, and price are required!" });
@@ -29,13 +29,13 @@ const addProduct = async (req, res) => {
       name: name,
       info: info,
       price: price,
-      group: group,
+      category: category,
     });
 
-    const productStore = await Product.findOne({ name: group });
+    const productStore = await Product.findOne({ name: category });
 
     if (!productStore)
-      return res.status(400).json({ message: "Invalid group!" });
+      return res.status(400).json({ message: "Invalid category!" });
 
     productStore.products.push(newItem);
 
@@ -55,15 +55,16 @@ const editProduct = async (req, res) => {};
 
 const getProductsByName = async (req, res) => {
   const { name } = req.params;
-  if (!name) return res.status(400).json({ message: "bad request!" });
+
+  if (!name) return res.status(400).json({ message: "Bad request!" });
   try {
-    let store = await Product.find({ name: name });
+    let store = await Product.findOne({ name }).populate("products");
 
-    store = store.products;
+    if (!store) return res.status(404).json({ message: "Product not found!" });
 
-    //   console.log(store);
-    return res.status(200).json({ store });
+    return res.status(200).json({ store: store.products });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error!" });
   }
 };
