@@ -71,8 +71,9 @@ const getProductsByName = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    res.status(200).json({ products });
+    const myProducts = await Product.find().populate("products");
+
+    res.status(200).json({ myProducts });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error!" });
