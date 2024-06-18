@@ -14,7 +14,8 @@ const transactionSchema = new Schema({
     type: String,
   },
   status: {
-    default: "pending",
+    type: String,
+    default: "pending", // Set the default value as a string
   },
 });
 

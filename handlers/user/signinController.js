@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const signinUser = async (req, res) => {
   const { username, password } = req.body;
-  // console.log(req.body);
+  console.log(req.body);
 
   if (!username || !password)
     return res.status(400).json({ message: "Bad request!" });
@@ -18,8 +18,8 @@ const signinUser = async (req, res) => {
       return res.status(401).json({ message: "invalid username OR password!" });
 
     const accessToken = jwt.sign(
-      { user: user.username },
-      { userId: user._id },
+      { user: user.username, userId: user._id },
+
       process.env.ACCESS_TOKEN,
       { expiresIn: "15m" }
     );
@@ -34,7 +34,15 @@ const signinUser = async (req, res) => {
     await user.save();
     res.cookie("jwt", refreshToken, { maxAge: 86400000, httpOnly: true });
 
-    res.status(200).json({ accessToken, user });
+    const userObj = {
+      username: user.username,
+      email: user.email,
+      createdAt: user.createdAt,
+      pendingOrders: user.pendingOrders,
+      completedOrders: user.completedOrders,
+    };
+
+    res.status(200).json({ accessToken, userObj });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error, Try again later" });

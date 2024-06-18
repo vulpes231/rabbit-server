@@ -7,6 +7,7 @@ const deposit = async (req, res) => {
   const userId = req.userId;
 
   if (!amount || isNaN(amount) || amount <= 0) {
+    //|| method !== "Admin"
     return res.status(400).json({
       message: "Invalid amount. Please provide a valid deposit amount.",
     });
@@ -44,7 +45,7 @@ const deposit = async (req, res) => {
 };
 
 const getBalance = async (req, res) => {
-  const userId = req.params.id; // Assuming 'id' is the parameter name in your route
+  const userId = req.userId; // Assuming 'id' is the parameter name in your route
   if (!userId) return res.status(400).json({ message: "Bad request!" });
 
   try {
