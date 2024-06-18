@@ -28,6 +28,8 @@ app.use(verifyJWT);
 app.use("/users", require("./routes/user/user"));
 app.use("/logout", require("./routes/user/logout"));
 app.use("/products", require("./routes/user/product"));
+app.use("/wallet", require("./routes/user/wallet"));
+app.use("/transactions", require("./routes/user/transaction"));
 
 app.use(errorLogger);
 

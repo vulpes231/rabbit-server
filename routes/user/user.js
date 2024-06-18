@@ -1,8 +1,11 @@
 const express = require("express");
-const { getAllUsers } = require("../../handlers/user/userController");
+const {
+  getAllUsers,
+  changePassword,
+} = require("../../handlers/user/userController");
 
 const router = express.Router();
 
-router.route("/").get(getAllUsers);
+router.route("/").get(getAllUsers).put(changePassword);
 
 module.exports = router;

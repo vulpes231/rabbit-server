@@ -12,7 +12,8 @@ const verifyJWT = (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
     if (err) return res.status(401).json({ message: "Unauthorized access!" });
     req.user = decoded.user;
-    // console.log(req.user);
+    req.userId = decoded.userId;
+    console.log(req.userId);
     next();
   });
 };
