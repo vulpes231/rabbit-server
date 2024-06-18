@@ -1,10 +1,13 @@
 const Transaction = require("../../models/Transaction");
 const Wallet = require("../../models/Wallet");
-// Transaction
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const deposit = async (req, res) => {
   const { amount, method } = req.body;
   const userId = req.userId;
+
+  const uid = new ObjectId(userId);
 
   if (!amount || isNaN(amount) || amount <= 0) {
     //|| method !== "Admin"
@@ -15,7 +18,7 @@ const deposit = async (req, res) => {
 
   try {
     // Find the wallet of the user
-    const wallet = await Wallet.findOne({ owner: userId });
+    const wallet = await Wallet.findOne({ owner: uid });
     if (!wallet) {
       return res
         .status(404)
@@ -45,11 +48,14 @@ const deposit = async (req, res) => {
 };
 
 const getBalance = async (req, res) => {
-  const userId = req.userId; // Assuming 'id' is the parameter name in your route
+  const userId = req.userId;
+
+  const uid = new ObjectId(userId);
+  // console.log(uid);
   if (!userId) return res.status(400).json({ message: "Bad request!" });
 
   try {
-    const balance = await Wallet.findOne({ owner: userId });
+    const balance = await Wallet.findOne({ owner: uid });
     if (!balance) {
       return res.status(404).json({ message: "Wallet not found" });
     }
