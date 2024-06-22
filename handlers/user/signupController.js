@@ -24,8 +24,8 @@ const signupUser = async (req, res) => {
 
     // Create a wallet for the new user
     const newWallet = await Wallet.create({
-      balance: 0, // You can initialize the balance to any default value
-      owner: newUser._id, // Assign the owner as the new user's ObjectId
+      balance: 0,
+      owner: newUser._id,
     });
 
     res

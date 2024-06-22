@@ -24,6 +24,10 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
   pendingOrders: {
     type: Number,
     default: 0,

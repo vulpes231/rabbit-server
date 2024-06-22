@@ -3,6 +3,25 @@ const Wallet = require("../../models/Wallet");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
+async function confirmTransaction(req, res) {
+  const { transactionId } = req.params;
+
+  console.log(transactionId);
+
+  try {
+    // Confirm the transaction
+    const wallet = await Wallet.confirmTransaction(transactionId);
+
+    res.status(200).json({
+      message: "Transaction confirmed successfully!",
+      wallet,
+    });
+  } catch (error) {
+    console.error("Error confirming transaction:", error);
+    res.status(500).json({ message: "An error occurred." });
+  }
+}
+
 const deposit = async (req, res) => {
   const { amount, method } = req.body;
   const userId = req.userId;
@@ -10,63 +29,68 @@ const deposit = async (req, res) => {
   const uid = new ObjectId(userId);
 
   if (!amount || isNaN(amount) || amount <= 0) {
-    //|| method !== "Admin"
     return res.status(400).json({
       message: "Invalid amount. Please provide a valid deposit amount.",
     });
   }
 
   try {
-    // Find the wallet of the user
+    // Find the wallet for the user
     const wallet = await Wallet.findOne({ owner: uid });
+
     if (!wallet) {
-      return res
-        .status(404)
-        .json({ message: "Wallet not found. Please create a wallet first." });
+      return res.status(404).json({ message: "Wallet not found." });
     }
 
-    wallet.balance += parseFloat(amount);
-    await wallet.save();
-
-    const transaction = new Transaction({
-      creator: userId,
-      amount: parseFloat(amount),
+    const transactionData = {
+      amount: amount,
       method: method,
-    });
+      creator: uid,
+    };
 
-    await transaction.save();
+    // Deposit the amount into the wallet
+    const updatedWallet = await Wallet.deposit(userId, transactionData);
 
     res.status(200).json({
-      message: `Deposited ${amount} into wallet. New balance: ${wallet.balance}`,
+      message: "Deposit successful!",
+      wallet: updatedWallet,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error depositing funds:", error);
     res
       .status(500)
       .json({ message: "An error occurred while processing the deposit." });
   }
 };
 
-const getBalance = async (req, res) => {
+const getUserBalance = async (req, res) => {
   const userId = req.userId;
 
-  const uid = new ObjectId(userId);
-  // console.log(uid);
-  if (!userId) return res.status(400).json({ message: "Bad request!" });
+  if (!userId) {
+    return res.status(400).json({ message: "Bad request!" });
+  }
 
   try {
-    const balance = await Wallet.findOne({ owner: uid });
-    if (!balance) {
-      return res.status(404).json({ message: "Wallet not found" });
+    const walletBalance = await Wallet.getBalance(userId);
+
+    if (!walletBalance) {
+      return res.status(404).json({ message: "Wallet not found." });
     }
-    res.status(200).json({ balance: balance.balance }); // Return only the balance field
+
+    // Return the balance
+    res.status(200).json({
+      walletBalance,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "An error occurred" });
+    console.error("Error fetching balance:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching balance." });
   }
 };
 
 module.exports = {
-  getBalance,
+  getUserBalance,
   deposit,
+  confirmTransaction,
 };

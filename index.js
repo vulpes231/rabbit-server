@@ -30,6 +30,7 @@ app.use("/logout", require("./routes/user/logout"));
 app.use("/products", require("./routes/user/product"));
 app.use("/wallet", require("./routes/user/wallet"));
 app.use("/transactions", require("./routes/user/transaction"));
+app.use("/order", require("./routes/user/order"));
 
 app.use(errorLogger);
 

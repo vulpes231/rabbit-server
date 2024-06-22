@@ -1,8 +1,13 @@
 const express = require("express");
-const { getBalance, deposit } = require("../../handlers/user/walletController");
+const {
+  getUserBalance,
+  deposit,
+  confirmTransaction,
+} = require("../../handlers/user/walletController");
 
 const router = express.Router();
 
-router.route("/").get(getBalance).post(deposit);
-
+router.route("/balance").get(getUserBalance);
+router.route("/deposit").post(deposit);
+router.route("/:transactionId").put(confirmTransaction);
 module.exports = router;

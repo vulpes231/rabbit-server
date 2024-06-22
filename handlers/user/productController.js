@@ -1,16 +1,25 @@
-const Item = require("../../models/Item");
 const Product = require("../../models/Product");
 
 const createNewProduct = async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.status(400).json({ message: "Name is required!" });
+  const { name, price, features, description, category } = req.body;
+
+  if (!name || !category) {
+    return res.status(400).json({ message: "Name is required!" });
+  }
+
   try {
-    const newProduct = await Product.create({
-      name: name,
-    });
+    const productData = { name, category };
+
+    // Optional fields
+    if (price) productData.price = price;
+    if (features) productData.features = features.toLowerCase();
+    if (description) productData.description = description.toLowerCase();
+
+    const newProduct = await Product.addProduct(productData);
 
     res.status(201).json({
       message: `New product ${newProduct.name} created successfully.`,
+      product: newProduct,
     });
   } catch (error) {
     console.error(error); // Log the error for debugging
@@ -18,51 +27,43 @@ const createNewProduct = async (req, res) => {
   }
 };
 
-const addProduct = async (req, res) => {
-  const { name, info, price, category } = req.body;
-  if (!name || !info || !price || !category)
-    return res
-      .status(400)
-      .json({ message: "Name, info, and price are required!" });
+const deleteProduct = async (req, res) => {
+  const { productId } = req.params;
+
   try {
-    const newItem = await Item.create({
-      name: name,
-      info: info,
-      price: price,
-      category: category,
+    const deletedProduct = await Product.deleteProductById(productId);
+
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found!" });
+    }
+
+    res.status(200).json({
+      message: `Product ${deletedProduct.name} deleted successfully.`,
+      deletedProduct,
     });
-
-    const productStore = await Product.findOne({ name: category });
-
-    if (!productStore)
-      return res.status(400).json({ message: "Invalid category!" });
-
-    productStore.products.push(newItem);
-
-    await productStore.save();
-
-    console.log(productStore);
-
-    res.status(200).json({ message: "Product added successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error!" });
   }
 };
 
-const deleteProduct = async (req, res) => {};
-const editProduct = async (req, res) => {};
+const getProductsById = async (req, res) => {
+  const { productId } = req.params;
 
-const getProductsByName = async (req, res) => {
-  const { name } = req.params;
+  if (!productId) {
+    return res.status(400).json({ message: "ID parameter is required!" });
+  }
 
-  if (!name) return res.status(400).json({ message: "Bad request!" });
   try {
-    let store = await Product.findOne({ name }).populate("products");
+    const products = await Product.findById(productId);
 
-    if (!store) return res.status(404).json({ message: "Product not found!" });
+    if (products.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No products found with that productId." });
+    }
 
-    return res.status(200).json({ store: store.products });
+    res.status(200).json({ products });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error!" });
@@ -71,20 +72,17 @@ const getProductsByName = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const myProducts = await Product.find().populate("products");
-
-    res.status(200).json({ myProducts });
+    const allProducts = await Product.find();
+    res.status(200).json({ products: allProducts });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Server error!" });
   }
 };
 
 module.exports = {
   createNewProduct,
-  addProduct,
-  editProduct,
   deleteProduct,
-  getProductsByName,
+  getProductsById,
   getAllProducts,
 };

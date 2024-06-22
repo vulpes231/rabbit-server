@@ -13,7 +13,8 @@ const verifyJWT = (req, res, next) => {
     if (err) return res.status(401).json({ message: "Unauthorized access!" });
     req.user = decoded.user;
     req.userId = decoded.userId;
-    // console.log(req.userId);
+    req.isAdmin = decoded.isAdmin;
+
     next();
   });
 };

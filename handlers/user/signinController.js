@@ -18,11 +18,12 @@ const signinUser = async (req, res) => {
       return res.status(401).json({ message: "invalid username OR password!" });
 
     const accessToken = jwt.sign(
-      { user: user.username, userId: user._id },
+      { user: user.username, userId: user._id, isAdmin: user.isAdmin },
 
       process.env.ACCESS_TOKEN,
       { expiresIn: "15m" }
     );
+
     const refreshToken = jwt.sign(
       { user: user.username },
       process.env.REFRESH_TOKEN,
