@@ -63,4 +63,5 @@ transactionSchema.statics.getTransactions = function () {
   return this.find();
 };
 
-module.exports = mongoose.model("Transaction", transactionSchema);
+const Transaction = mongoose.model("Transaction", transactionSchema);
+module.exports = Transaction;

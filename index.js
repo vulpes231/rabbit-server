@@ -31,6 +31,7 @@ app.use("/products", require("./routes/user/product"));
 app.use("/wallet", require("./routes/user/wallet"));
 app.use("/transactions", require("./routes/user/transaction"));
 app.use("/order", require("./routes/user/order"));
+app.use("/productsadmin", require("./routes/admin/prodAdmin"));
 
 app.use(errorLogger);
 

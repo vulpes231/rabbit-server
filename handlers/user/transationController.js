@@ -16,24 +16,6 @@ async function createTransaction(req, res) {
   }
 }
 
-// async function confirmTransaction(req, res) {
-//   const { transactionId } = req.params;
-
-//   try {
-//     const updatedTransaction = await Transaction.confirmTransaction(
-//       transactionId
-//     );
-
-//     res.status(200).json({
-//       message: `Transaction ${transactionId} confirmed successfully!`,
-//       transaction: updatedTransaction,
-//     });
-//   } catch (error) {
-//     console.error("Error confirming transaction:", error);
-//     res.status(500).json({ message: "An error occurred." });
-//   }
-// }
-
 async function getUserTransactions(req, res) {
   const { userId } = req.params;
 
