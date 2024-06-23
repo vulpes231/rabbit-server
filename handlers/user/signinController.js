@@ -21,7 +21,7 @@ const signinUser = async (req, res) => {
       { user: user.username, userId: user._id, isAdmin: user.isAdmin },
 
       process.env.ACCESS_TOKEN,
-      { expiresIn: "15m" }
+      { expiresIn: "1d" }
     );
 
     const refreshToken = jwt.sign(
