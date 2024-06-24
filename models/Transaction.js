@@ -30,24 +30,23 @@ transactionSchema.statics.createTransaction = async function (transactionData) {
   }
 };
 
-// // Static method to confirm a transaction (change status to "completed")
-// transactionSchema.statics.confirmTransaction = async function (transactionId) {
-//   try {
-//     const transaction = await this.findByIdAndUpdate(
-//       transactionId,
-//       { status: "completed" },
-//       { new: true }
-//     );
+transactionSchema.statics.confirmTransaction = async function (transactionId) {
+  try {
+    const transaction = await this.findByIdAndUpdate(
+      transactionId,
+      { status: "completed" },
+      { new: true }
+    );
 
-//     if (!transaction) {
-//       throw new Error("Transaction not found!");
-//     }
+    if (!transaction) {
+      throw new Error("Transaction not found!");
+    }
 
-//     return transaction;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+    return transaction;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Static method to get all transactions of a user
 transactionSchema.statics.getUserTransactions = async function (userId) {
