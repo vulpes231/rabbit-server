@@ -3,9 +3,6 @@ const Admin = require("../../models/Admin");
 const jwt = require("jsonwebtoken");
 
 const signinAdmin = async (req, res) => {
-  const isAdmin = req.isAdmin;
-  if (!isAdmin) return res.status(403).json({ message: "forbidden access!" });
-
   const { username, password } = req.body;
   console.log(username, password);
 
@@ -16,6 +13,9 @@ const signinAdmin = async (req, res) => {
     const admin = await Admin.findOne({ username: username });
     if (!admin)
       return res.status(404).json({ message: "admin does not exist!" });
+
+    const isAdmin = admin.isAdmin;
+    if (!isAdmin) return res.status(403).json({ message: "forbidden access!" });
 
     const matchPass = await bcrypt.compare(password, admin.password);
     if (!matchPass)

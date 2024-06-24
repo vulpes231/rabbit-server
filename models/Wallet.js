@@ -14,6 +14,10 @@ const walletSchema = new Schema({
   },
 });
 
+walletSchema.statics.getWallets = function () {
+  return this.find();
+};
+
 // Static method to get wallet balance
 walletSchema.statics.getBalance = async function (userId) {
   try {

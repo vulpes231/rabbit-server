@@ -29,19 +29,7 @@ async function getUserTransactions(req, res) {
   }
 }
 
-const getAllTrnx = async (req, res) => {
-  try {
-    const allTrnx = await Transaction.getTransactions();
-    res.status(200).json({ trnx: allTrnx });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error!" });
-  }
-};
-
 module.exports = {
   createTransaction,
-  // confirmTransaction,
   getUserTransactions,
-  getAllTrnx,
 };

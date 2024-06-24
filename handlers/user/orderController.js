@@ -36,33 +36,4 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-const getAllOrders = async (req, res) => {
-  try {
-    const orders = await Order.getAllOrders();
-
-    res.status(200).json({ orders });
-  } catch (error) {
-    console.error("Error getting user orders:", error);
-    res.status(500).json({ message: "An error occurred." });
-  }
-};
-
-const completeOrder = async (req, res) => {
-  const { orderId } = req.body;
-
-  try {
-    // Complete the order using the static method from the Order model
-    const completedOrder = await Order.completeOrder(orderId);
-
-    if (!completedOrder) {
-      return res.status(404).json({ message: "Order not found." });
-    }
-
-    res.status(200).json({ order: completedOrder });
-  } catch (error) {
-    console.error("Error completing order:", error);
-    res.status(500).json({ message: "An error occurred." });
-  }
-};
-
-module.exports = { createOrder, getUserOrders, completeOrder, getAllOrders };
+module.exports = { createOrder, getUserOrders };

@@ -19,11 +19,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 
-// endpoints
+// admin endpoints without auth
+app.use("/login", require("./routes/admin/login"));
+app.use("/enroll", require("./routes/admin/create"));
+// user endpoints wihtout auth
 app.use("/signin", require("./routes/user/signin"));
 app.use("/signup", require("./routes/user/signup"));
 app.use("/", require("./routes/root"));
 
+// user endpoints with auth
 app.use(verifyJWT);
 app.use("/users", require("./routes/user/user"));
 app.use("/logout", require("./routes/user/logout"));
@@ -31,7 +35,13 @@ app.use("/products", require("./routes/user/product"));
 app.use("/wallet", require("./routes/user/wallet"));
 app.use("/transactions", require("./routes/user/transaction"));
 app.use("/order", require("./routes/user/order"));
-app.use("/productsadmin", require("./routes/admin/prodAdmin"));
+
+// admin endpoints with auth
+app.use("/manageproducts", require("./routes/admin/prodAdmin"));
+app.use("/manageusers", require("./routes/admin/useraccess"));
+app.use("/manageorders", require("./routes/admin/orderaccess"));
+app.use("/managetrnxs", require("./routes/admin/trnxaccess"));
+app.use("/managewallets", require("./routes/admin/walletaccess"));
 
 app.use(errorLogger);
 

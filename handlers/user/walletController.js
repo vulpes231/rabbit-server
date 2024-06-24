@@ -3,25 +3,6 @@ const Wallet = require("../../models/Wallet");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-async function confirmTransaction(req, res) {
-  const { transactionId } = req.params;
-
-  console.log(transactionId);
-
-  try {
-    // Confirm the transaction
-    const wallet = await Wallet.confirmTransaction(transactionId);
-
-    res.status(200).json({
-      message: "Transaction confirmed successfully!",
-      wallet,
-    });
-  } catch (error) {
-    console.error("Error confirming transaction:", error);
-    res.status(500).json({ message: "An error occurred." });
-  }
-}
-
 const deposit = async (req, res) => {
   const { amount, method } = req.body;
   const userId = req.userId;
@@ -92,5 +73,4 @@ const getUserBalance = async (req, res) => {
 module.exports = {
   getUserBalance,
   deposit,
-  confirmTransaction,
 };
