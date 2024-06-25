@@ -14,7 +14,7 @@ const walletSchema = new Schema({
   },
 });
 
-walletSchema.statics.getWallets = function () {
+walletSchema.statics.getAllWallets = function () {
   return this.find();
 };
 
