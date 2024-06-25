@@ -41,12 +41,11 @@ const signinAdmin = async (req, res) => {
     await admin.save();
 
     const adminObj = {
-      username: user.username,
-      accessToken: accessToken,
+      username: admin.username,
     };
 
     res.cookie("jwt", refreshToken);
-    res.status(200).json({ adminObj });
+    res.status(200).json({ adminObj, accessToken });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "An error occured." });
