@@ -7,7 +7,9 @@ const deleteProduct = async (req, res) => {
     return res.status(403).json({ message: "forbidden access!" });
   }
 
-  const { productId } = req.body;
+  const { productId } = req.params;
+
+  console.log(productId);
 
   try {
     const deletedProduct = await Product.deleteProductById(productId);
