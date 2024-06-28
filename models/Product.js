@@ -56,6 +56,22 @@ productSchema.statics.deleteProductById = async function (productId) {
   }
 };
 
+productSchema.statics.editProduct = async function (productId, updatedData) {
+  try {
+    const updatedProduct = await this.findByIdAndUpdate(
+      productId,
+      updatedData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    return updatedProduct;
+  } catch (error) {
+    throw error;
+  }
+};
+
 productSchema.statics.getAllProducts = function () {
   return this.find();
 };

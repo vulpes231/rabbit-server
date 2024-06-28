@@ -7,7 +7,7 @@ const deleteProduct = async (req, res) => {
     return res.status(403).json({ message: "forbidden access!" });
   }
 
-  const { productId } = req.params;
+  const { productId } = req.body;
 
   try {
     const deletedProduct = await Product.deleteProductById(productId);
@@ -23,6 +23,34 @@ const deleteProduct = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error!" });
+  }
+};
+const editProduct = async (req, res) => {
+  const isAdmin = req.isAdmin;
+
+  if (!isAdmin) {
+    return res.status(403).json({ message: "forbidden access!" });
+  }
+
+  const { productId, name, price, description, category, features } = req.body;
+
+  try {
+    const updatedProductData = {
+      name: name,
+      price: price,
+      description: description,
+      category: category,
+      features: features,
+      inStock: true,
+    };
+
+    const updatedProduct = await Product.editProduct(
+      productId,
+      updatedProductData
+    );
+    console.log("Updated Product:", updatedProduct);
+  } catch (error) {
+    console.error("Error updating product:", error);
   }
 };
 
@@ -58,4 +86,4 @@ const createNewProduct = async (req, res) => {
   }
 };
 
-module.exports = { deleteProduct, createNewProduct };
+module.exports = { deleteProduct, createNewProduct, editProduct };
