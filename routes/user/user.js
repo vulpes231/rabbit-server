@@ -1,8 +1,11 @@
 const express = require("express");
-const { changePassword } = require("../../handlers/user/userController");
+const {
+  changePassword,
+  getUser,
+} = require("../../handlers/user/userController");
 
 const router = express.Router();
 
-router.route("/").put(changePassword);
+router.route("/").get(getUser).put(changePassword);
 
 module.exports = router;

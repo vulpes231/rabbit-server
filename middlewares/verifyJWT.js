@@ -10,7 +10,7 @@ const verifyJWT = (req, res, next) => {
   if (!token) return res.status(403).json({ message: "Forbidden!" });
 
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
-    if (err) return res.status(401).json({ message: "Unauthorized access!" });
+    if (err) return res.status(400).json({ message: "Bad token!" });
     req.user = decoded.user;
     req.userId = decoded.userId;
     req.isAdmin = decoded.isAdmin;

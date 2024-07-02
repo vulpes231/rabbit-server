@@ -2,6 +2,8 @@ const Transaction = require("../../models/Transaction");
 
 async function createTransaction(req, res) {
   const { creator, amount, method } = req.body;
+
+  console.log(req.body);
   try {
     const transactionData = { creator, amount, method };
     const newTransaction = await Transaction.createTransaction(transactionData);
@@ -17,7 +19,7 @@ async function createTransaction(req, res) {
 }
 
 async function getUserTransactions(req, res) {
-  const { userId } = req.params;
+  const userId = req.userId;
 
   try {
     const transactions = await Transaction.getUserTransactions(userId);

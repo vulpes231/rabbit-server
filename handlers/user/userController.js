@@ -1,6 +1,20 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 
+const getUser = async (req, res) => {
+  const userId = req.userId;
+  // console.log("fired", userId);
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) return res.status(404).json({ message: "user not found!" });
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "An error occured" });
+  }
+};
+
 const changePassword = async (req, res) => {
   try {
     const { currentPass, newPass } = req.body;
@@ -32,4 +46,4 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { changePassword };
+module.exports = { changePassword, getUser };

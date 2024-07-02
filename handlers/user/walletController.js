@@ -1,13 +1,9 @@
-const Transaction = require("../../models/Transaction");
 const Wallet = require("../../models/Wallet");
-const mongoose = require("mongoose");
-const ObjectId = mongoose.Types.ObjectId;
 
 const deposit = async (req, res) => {
   const { amount, method } = req.body;
   const userId = req.userId;
-
-  const uid = new ObjectId(userId);
+  console.log(req.body);
 
   if (!amount || isNaN(amount) || amount <= 0) {
     return res.status(400).json({
@@ -17,7 +13,7 @@ const deposit = async (req, res) => {
 
   try {
     // Find the wallet for the user
-    const wallet = await Wallet.findOne({ owner: uid });
+    const wallet = await Wallet.findOne({ owner: userId });
 
     if (!wallet) {
       return res.status(404).json({ message: "Wallet not found." });
@@ -26,7 +22,7 @@ const deposit = async (req, res) => {
     const transactionData = {
       amount: amount,
       method: method,
-      creator: uid,
+      creator: userId,
     };
 
     // Deposit the amount into the wallet

@@ -7,6 +7,6 @@ const {
 const router = express.Router();
 
 router.route("/").get(getAllWallets);
-router.route("/:transactionId").put(confirmTransaction);
+router.route("/").put(confirmTransaction);
 
 module.exports = router;

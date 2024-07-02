@@ -1,7 +1,7 @@
 const Wallet = require("../../models/Wallet");
 
 async function confirmTransaction(req, res) {
-  const { transactionId } = req.params;
+  const { transactionId } = req.body;
 
   console.log(transactionId);
   const isAdmin = req.isAdmin;

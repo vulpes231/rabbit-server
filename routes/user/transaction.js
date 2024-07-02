@@ -5,6 +5,6 @@ const {
 
 const router = express.Router();
 
-router.route("/:userId").get(getUserTransactions);
+router.route("/").get(getUserTransactions);
 
 module.exports = router;
