@@ -50,10 +50,6 @@ const getUserBalance = async (req, res) => {
   try {
     const walletBalance = await Wallet.getBalance(userId);
 
-    if (!walletBalance) {
-      return res.status(404).json({ message: "Wallet not found." });
-    }
-
     // Return the balance
     res.status(200).json({
       walletBalance,

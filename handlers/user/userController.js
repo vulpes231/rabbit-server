@@ -1,14 +1,17 @@
 const User = require("../../models/User");
+// Wallet
 const bcrypt = require("bcryptjs");
+const Wallet = require("../../models/Wallet");
 
 const getUser = async (req, res) => {
   const userId = req.userId;
   // console.log("fired", userId);
   try {
     const user = await User.findOne({ _id: userId });
+    const wallet = await Wallet.findOne({ owner: userId });
 
     if (!user) return res.status(404).json({ message: "user not found!" });
-    return res.status(200).json({ user });
+    return res.status(200).json({ user, wallet });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "An error occured" });
