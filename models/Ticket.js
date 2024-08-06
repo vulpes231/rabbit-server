@@ -1,0 +1,59 @@
+const { default: mongoose } = require("mongoose");
+const Schema = mongoose.Schema;
+
+const ticketSchema = new Schema({
+  createdBy: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: "open", // default status
+  },
+  orderId: {
+    type: String,
+  },
+  messages: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Message", // Reference to Message schema
+    },
+  ],
+});
+
+const Order = require("./Order");
+
+// Create a new ticket
+ticketSchema.statics.createTicket = async function (orderId) {
+  try {
+    // Find the order by ID
+    const order = await Order.findById(orderId);
+    if (!order) throw new Error("Order not found!");
+
+    // Create and save a new Ticket instance
+    const newTicket = new this({
+      createdBy: order.creator, // Make sure 'creator' is a valid field on the Order model
+      orderId: order._id,
+    });
+
+    return await newTicket.save(); // Return the saved ticket
+  } catch (error) {
+    throw new Error(error.message); // Provide more informative error messages
+  }
+};
+
+// Update ticket status
+ticketSchema.statics.updateTicket = async function (status, ticketId) {
+  return await this.findByIdAndUpdate(ticketId, status, {
+    new: true,
+  });
+};
+
+// Delete a ticket
+ticketSchema.statics.deleteTicket = async function (ticketId) {
+  // Delete associated messages first
+  await Message.deleteMany({ chatId: ticketId });
+  return await this.findByIdAndDelete(ticketId);
+};
+
+const Ticket = mongoose.model("Ticket", ticketSchema);
+module.exports = Ticket;

@@ -35,6 +35,8 @@ app.use("/products", require("./routes/user/product"));
 app.use("/wallet", require("./routes/user/wallet"));
 app.use("/transactions", require("./routes/user/transaction"));
 app.use("/order", require("./routes/user/order"));
+app.use("/chat", require("./routes/user/message"));
+app.use("/ticket", require("./routes/user/ticket"));
 
 // admin endpoints with auth
 app.use("/manageproducts", require("./routes/admin/prodAdmin"));
@@ -42,6 +44,8 @@ app.use("/manageusers", require("./routes/admin/useraccess"));
 app.use("/manageorders", require("./routes/admin/orderaccess"));
 app.use("/managetrnxs", require("./routes/admin/trnxaccess"));
 app.use("/managewallets", require("./routes/admin/walletaccess"));
+app.use("/managechat", require("./routes/admin/chat"));
+app.use("/manageticket", require("./routes/admin/ticket"));
 
 app.use(errorLogger);
 
