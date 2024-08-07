@@ -4,11 +4,31 @@ const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
 const { reqLogger, errorLogger } = require("./middlewares/logger");
 const { corsOptions } = require("./configs/corsOptions");
+// allowedOrigins
 require("dotenv").config();
 const cors = require("cors");
 const { verifyJWT } = require("./middlewares/verifyJWT");
+const socketIo = require("socket.io");
+const Message = require("./models/Message");
+const http = require("http");
+const { allowedOrigins } = require("./configs/allowedOrigins");
 
 const app = express();
+const server = http.createServer(app);
+
+const io = socketIo(server, {
+  cors: {
+    origin: function (origin, callback) {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST"],
+  },
+});
+
 connectDB();
 const PORT = process.env.PORT || 3000;
 
@@ -18,6 +38,34 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.on("joinChat", (chatId) => {
+    socket.join(chatId);
+  });
+
+  socket.on("sendMessage", async (data) => {
+    try {
+      const newMessage = new Message({
+        chatId: data.chatId,
+        from: data.username,
+        msg: data.msg,
+      });
+      await newMessage.save();
+
+      // Broadcast the message to other clients
+      io.to(data.chatId).emit("newMessage", newMessage);
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 // admin endpoints without auth
 app.use("/login", require("./routes/admin/login"));
@@ -50,7 +98,7 @@ app.use("/manageticket", require("./routes/admin/ticket"));
 app.use(errorLogger);
 
 mongoose.connection.once("connected", () => {
-  app.listen(PORT, () =>
+  server.listen(PORT, () =>
     console.log(`Server started on http://localhost:${PORT}`)
   );
 });

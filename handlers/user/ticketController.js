@@ -2,6 +2,7 @@ const Ticket = require("../../models/Ticket");
 
 const createNewTicket = async (req, res) => {
   const { orderId } = req.body;
+  // console.log("id", orderId);
 
   try {
     const ticket = await Ticket.createTicket(orderId);
@@ -10,5 +11,15 @@ const createNewTicket = async (req, res) => {
     res.status(500).json({ message: error.message }); // Return the error message
   }
 };
+const getTicketByOrderId = async (req, res) => {
+  const { orderId } = req.params;
 
-module.exports = { createNewTicket };
+  try {
+    const ticket = await Ticket.getTicketByOrderId(orderId);
+    res.status(201).json({ ticket });
+  } catch (error) {
+    res.status(500).json({ message: error.message }); // Return the error message
+  }
+};
+
+module.exports = { createNewTicket, getTicketByOrderId };

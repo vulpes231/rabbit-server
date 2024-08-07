@@ -35,7 +35,8 @@ messageSchema.statics.sendMessage = async function (from, msg, chatId) {
 
 // Get messages by ticket ID
 messageSchema.statics.getMessagesByTicketId = async function (ticketId) {
-  return await this.find({ chatId: ticketId }).sort({ date: 1 });
+  // console.log(ticketId);
+  return await this.find({ chatId: ticketId }).populate().sort({ date: 1 });
 };
 
 // Delete messages by ticket ID

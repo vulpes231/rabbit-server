@@ -5,17 +5,12 @@ const userSendMessage = async (req, res) => {
   const userId = req.userId;
 
   const { msg, chatId } = req.body;
+  // console.log(req.body);
 
   try {
     const user = await User.findOne({ _id: userId });
 
-    const createData = {
-      from: user.username,
-      msg: msg,
-      chatId: chatId,
-    };
-
-    await Message.sendMessage(createData);
+    await Message.sendMessage(user.username, msg, chatId);
   } catch (error) {
     res.status(500).json({ message: "Error sending message" });
   }

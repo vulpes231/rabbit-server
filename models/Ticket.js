@@ -29,6 +29,9 @@ ticketSchema.statics.createTicket = async function (orderId) {
     const order = await Order.findById(orderId);
     if (!order) throw new Error("Order not found!");
 
+    const ticket = await Ticket.findOne({ orderId: order._id });
+    if (ticket) throw new Error("Ticket already exist!");
+
     // Create and save a new Ticket instance
     const newTicket = new this({
       createdBy: order.creator, // Make sure 'creator' is a valid field on the Order model
@@ -53,6 +56,19 @@ ticketSchema.statics.deleteTicket = async function (ticketId) {
   // Delete associated messages first
   await Message.deleteMany({ chatId: ticketId });
   return await this.findByIdAndDelete(ticketId);
+};
+
+ticketSchema.statics.getTicketByOrderId = async function (orderId) {
+  try {
+    const ticket = await Ticket.findOne({ orderId: orderId });
+    if (!ticket) {
+      throw new Error(`Ticket with orderId ${orderId} not found.`);
+    }
+    return ticket;
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error retrieving ticket: ${error.message}`);
+  }
 };
 
 const Ticket = mongoose.model("Ticket", ticketSchema);
