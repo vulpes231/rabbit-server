@@ -21,6 +21,7 @@ const ticketSchema = new Schema({
 });
 
 const Order = require("./Order");
+const User = require("./User");
 
 // Create a new ticket
 ticketSchema.statics.createTicket = async function (orderId) {
@@ -32,9 +33,12 @@ ticketSchema.statics.createTicket = async function (orderId) {
     const ticket = await Ticket.findOne({ orderId: order._id });
     if (ticket) throw new Error("Ticket already exist!");
 
+    const creator = await User.findOne({ _id: order.creator });
+
     // Create and save a new Ticket instance
     const newTicket = new this({
-      createdBy: order.creator, // Make sure 'creator' is a valid field on the Order model
+      createdBy: order.creator,
+      user: creator.username,
       orderId: order._id,
     });
 

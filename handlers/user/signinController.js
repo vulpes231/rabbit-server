@@ -41,6 +41,7 @@ const signinUser = async (req, res) => {
       createdAt: user.createdAt,
       pendingOrders: user.pendingOrders,
       completedOrders: user.completedOrders,
+      isAdmin: user.isAdmin,
     };
 
     res.status(200).json({ accessToken, userObj });

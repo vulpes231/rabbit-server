@@ -11,14 +11,14 @@ const createNewTicket = async (req, res) => {
     res.status(500).json({ message: error.message }); // Return the error message
   }
 };
+
 const getTicketByOrderId = async (req, res) => {
   const { orderId } = req.params;
-
   try {
     const ticket = await Ticket.getTicketByOrderId(orderId);
     res.status(201).json({ ticket });
   } catch (error) {
-    res.status(500).json({ message: error.message }); // Return the error message
+    res.status(500).json({ message: error.message });
   }
 };
 

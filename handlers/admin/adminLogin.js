@@ -42,6 +42,7 @@ const signinAdmin = async (req, res) => {
 
     const adminObj = {
       username: admin.username,
+      isAdmin: admin.isAdmin,
     };
 
     res.cookie("jwt", refreshToken);
