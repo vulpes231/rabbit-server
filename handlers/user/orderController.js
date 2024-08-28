@@ -1,17 +1,15 @@
 const Order = require("../../models/Order");
 
 const createOrder = async (req, res) => {
+  const userId = req.userId;
+  const { item, price } = req.body;
+  console.log(req.body);
+
+  if (!item || price == undefined)
+    return res
+      .status(400)
+      .json({ message: "Product name and price are required." });
   try {
-    const { item, price } = req.body;
-
-    if (!item || !price) {
-      return res
-        .status(400)
-        .json({ message: "Product name and price are required." });
-    }
-
-    const userId = req.userId;
-
     const orderData = {
       creator: userId,
       item,
