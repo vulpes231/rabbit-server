@@ -94,6 +94,9 @@ web_modules/
 
 .yarn-integrity
 
+#migration file
+migrate.js
+
 # dotenv environment variable files
 
 .env

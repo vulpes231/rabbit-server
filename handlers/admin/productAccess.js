@@ -1,15 +1,74 @@
 const Product = require("../../models/Product");
 
-const deleteProduct = async (req, res) => {
+const createNewProduct = async (req, res) => {
   const isAdmin = req.isAdmin;
 
+  if (!isAdmin) {
+    return res.status(404).json({ message: "forbidden access!" });
+  }
+  const { name, price, features, descriptions, category } = req.body;
+
+  if (!name || !category || !price) {
+    return res.status(400).json({ message: "All field required!" });
+  }
+
+  try {
+    const productData = { name, category, price, features, descriptions };
+    const newProduct = await Product.addProduct(productData);
+
+    res.status(201).json({
+      message: `New product ${newProduct.name} created successfully.`,
+      product: newProduct,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+const editProduct = async (req, res) => {
+  const isAdmin = req.isAdmin;
   if (!isAdmin) {
     return res.status(403).json({ message: "forbidden access!" });
   }
 
   const { productId } = req.params;
+  if (!productId) {
+    return res.status(400).json({ message: "Product ID required!" });
+  }
 
-  console.log(productId);
+  const { name, price } = req.body;
+  if (!name || !price) {
+    return res.status(403).json({ message: "All fields required!" });
+  }
+
+  try {
+    const updatedProductData = {
+      name: name,
+      price: price,
+    };
+
+    const updatedProduct = await Product.editProduct(
+      productId,
+      updatedProductData
+    );
+    res.status(200).json({ message: "Product updated successfullly" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating product" });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  const isAdmin = req.isAdmin;
+  if (!isAdmin) {
+    return res.status(403).json({ message: "forbidden access!" });
+  }
+
+  const { productId } = req.params;
+  if (!productId) {
+    return res.status(400).json({ message: "Product ID required!" });
+  }
 
   try {
     const deletedProduct = await Product.deleteProductById(productId);
@@ -24,68 +83,75 @@ const deleteProduct = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error!" });
+    res.status(500).json({ message: "Error deleting product!" });
   }
 };
-const editProduct = async (req, res) => {
-  const isAdmin = req.isAdmin;
 
+const addProductFeature = async (req, res) => {
+  const isAdmin = req.isAdmin;
   if (!isAdmin) {
     return res.status(403).json({ message: "forbidden access!" });
   }
 
-  const { productId, name, price, description, category, features } = req.body;
+  const { productId } = req.params;
+  if (!productId) {
+    return res.status(400).json({ message: "Product ID required!" });
+  }
+
+  const { feature } = req.body;
+  if (!feature) {
+    return res
+      .status(400)
+      .json({ message: "Feature and productId are required." });
+  }
 
   try {
-    const updatedProductData = {
-      name: name,
-      price: price,
-      description: description,
-      category: category,
-      features: features,
-      inStock: true,
-    };
-
-    const updatedProduct = await Product.editProduct(
-      productId,
-      updatedProductData
-    );
-    console.log("Updated Product:", updatedProduct);
+    const updatedProduct = await Product.addFeature(productId, feature);
+    res
+      .status(200)
+      .json({ message: "Feature added successfully", product: updatedProduct });
   } catch (error) {
-    console.error("Error updating product:", error);
+    console.error(error);
+    res.status(500).json({ message: "Error adding feature!" });
   }
 };
 
-const createNewProduct = async (req, res) => {
+const addProductDescription = async (req, res) => {
   const isAdmin = req.isAdmin;
-
   if (!isAdmin) {
-    return res.status(404).json({ message: "forbidden access!" });
+    return res.status(403).json({ message: "forbidden access!" });
   }
-  const { name, price, features, description, category } = req.body;
 
-  if (!name || !category) {
-    return res.status(400).json({ message: "Name is required!" });
+  const { productId } = req.params;
+  if (!productId) {
+    return res.status(400).json({ message: "Product ID required!" });
+  }
+
+  const { description } = req.body;
+
+  if (!description) {
+    return res
+      .status(400)
+      .json({ message: "Description and productId are required." });
   }
 
   try {
-    const productData = { name, category };
+    const updatedProduct = await Product.addDescription(productId, description);
 
-    // Optional fields
-    if (price) productData.price = price;
-    if (features) productData.features = features.toLowerCase();
-    if (description) productData.description = description.toLowerCase();
-
-    const newProduct = await Product.addProduct(productData);
-
-    res.status(201).json({
-      message: `New product ${newProduct.name} created successfully.`,
-      product: newProduct,
+    res.status(200).json({
+      message: "Description added successfully",
+      description: updatedProduct,
     });
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).json({ message: "Server error!" });
+    console.error(error);
+    res.status(500).json({ message: "Error adding description" });
   }
 };
 
-module.exports = { deleteProduct, createNewProduct, editProduct };
+module.exports = {
+  deleteProduct,
+  createNewProduct,
+  editProduct,
+  addProductFeature,
+  addProductDescription,
+};

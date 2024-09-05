@@ -15,9 +15,9 @@ const productSchema = new Schema({
     type: [String],
     default: [],
   },
-  description: {
-    type: String,
-    default: null,
+  descriptions: {
+    type: [String],
+    default: [],
   },
   category: {
     type: String,
@@ -29,8 +29,40 @@ const productSchema = new Schema({
   },
 });
 
-productSchema.statics.findById = function (productId) {
-  return this.findOne({ _id: productId });
+productSchema.statics.addFeature = async function (productId, feature) {
+  try {
+    const product = await this.findOne({ _id: productId });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    product.features.push(feature);
+
+    const updatedProduct = await product.save();
+
+    return updatedProduct;
+  } catch (error) {
+    throw error;
+  }
+};
+
+productSchema.statics.addDescription = async function (productId, description) {
+  try {
+    const product = await this.findOne({ _id: productId });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    product.descriptions.push(description);
+
+    const updatedProduct = await product.save();
+
+    return updatedProduct;
+  } catch (error) {
+    throw error;
+  }
 };
 
 productSchema.statics.findByCategory = function (category) {
