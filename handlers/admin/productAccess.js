@@ -29,7 +29,7 @@ const createNewProduct = async (req, res) => {
 const editProduct = async (req, res) => {
   const isAdmin = req.isAdmin;
   if (!isAdmin) {
-    return res.status(403).json({ message: "forbidden access!" });
+    return res.status(403).json({ message: "Forbidden access!" });
   }
 
   const { productId } = req.params;
@@ -37,22 +37,31 @@ const editProduct = async (req, res) => {
     return res.status(400).json({ message: "Product ID required!" });
   }
 
-  const { name, price } = req.body;
-  if (!name || !price) {
-    return res.status(403).json({ message: "All fields required!" });
+  const { name, price, descriptions, features } = req.body;
+  if (!name || !price || !descriptions || !features) {
+    return res.status(400).json({ message: "All fields required!" });
   }
 
   try {
     const updatedProductData = {
-      name: name,
-      price: price,
+      name,
+      price,
+      descriptions,
+      features,
     };
 
     const updatedProduct = await Product.editProduct(
       productId,
       updatedProductData
     );
-    res.status(200).json({ message: "Product updated successfullly" });
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found!" });
+    }
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating product" });
