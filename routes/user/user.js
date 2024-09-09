@@ -1,11 +1,8 @@
 const express = require("express");
-const {
-  changePassword,
-  getUser,
-} = require("../../handlers/user/userController");
+const { getUser, editUser } = require("../../handlers/user/userController");
 
 const router = express.Router();
 
-router.route("/").get(getUser).put(changePassword);
+router.route("/").get(getUser).put(editUser);
 
 module.exports = router;
