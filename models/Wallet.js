@@ -31,6 +31,8 @@ walletSchema.statics.getBalance = async function (userId) {
   }
 };
 
+const Transaction = require("./Transaction");
+
 // Static method to deposit funds into wallet
 walletSchema.statics.deposit = async function (userId, transactionData) {
   try {
@@ -40,7 +42,6 @@ walletSchema.statics.deposit = async function (userId, transactionData) {
       throw new Error("Wallet not found!");
     }
 
-    const Transaction = require("./Transaction");
     const transaction = await Transaction.createTransaction(transactionData);
 
     return transaction; // Return the created transaction object
@@ -49,36 +50,51 @@ walletSchema.statics.deposit = async function (userId, transactionData) {
   }
 };
 
-// Static method to confirm a transaction
-walletSchema.statics.confirmTransaction = async function (transactionId) {
-  try {
-    // Fetch the transaction details (assuming you have a Transaction model)
-    const Transaction = require("./Transaction");
+walletSchema.statics.confirmTransaction = async function (updateData) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-    const transaction = await Transaction.findById(transactionId);
+  try {
+    // Fetch the transaction details
+    const transaction = await Transaction.findById(
+      updateData.transactionId
+    ).session(session);
     if (!transaction) {
       throw new Error("Transaction not found!");
     }
 
-    const userWallet = await this.findOne({ owner: transaction.creator });
-
-    // Increase the balance of the creator of the transaction
-    const wallet = await this.findByIdAndUpdate(
-      userWallet._id,
-      { $inc: { balance: transaction.amount } },
-      { new: true }
+    // Find the wallet associated with the transaction creator
+    const wallet = await this.findOne({ owner: transaction.creator }).session(
+      session
     );
-
     if (!wallet) {
       throw new Error("Wallet of transaction creator not found!");
     }
 
-    // Optionally, you can update the status of the transaction to 'completed'
-    transaction.status = "completed";
-    await transaction.save();
+    if (updateData.paid) {
+      // Increase the balance of the wallet
+      wallet.balance += updateData.amount;
+      await wallet.save({ session });
+
+      // Update the transaction status
+      transaction.status = "completed";
+      await transaction.save({ session });
+    } else {
+      // Handle other status updates if necessary
+      transaction.status = updateData.status;
+      await transaction.save({ session });
+    }
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
 
     return wallet;
   } catch (error) {
+    // Rollback the transaction if any error occurs
+    await session.abortTransaction();
+    session.endSession();
+
     throw error;
   }
 };

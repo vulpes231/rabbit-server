@@ -95,6 +95,7 @@ app.use("/managewallets", require("./routes/admin/walletaccess"));
 app.use("/managechat", require("./routes/admin/chat"));
 app.use("/manageticket", require("./routes/admin/ticket"));
 app.use("/managelogout", require("./routes/admin/managelogout"));
+app.use("/callback", require("./routes/admin/confirm"));
 
 app.use(errorLogger);
 

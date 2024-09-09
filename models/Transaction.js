@@ -10,7 +10,10 @@ const transactionSchema = new Schema({
   amount: {
     type: Number,
   },
-  method: {
+  currency: {
+    type: String,
+  },
+  network: {
     type: String,
   },
   status: {
