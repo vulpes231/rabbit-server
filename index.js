@@ -55,7 +55,6 @@ io.on("connection", (socket) => {
       });
       await newMessage.save();
 
-      // Broadcast the message to other clients
       io.to(data.chatId).emit("newMessage", newMessage);
     } catch (error) {
       console.error("Error saving message:", error);

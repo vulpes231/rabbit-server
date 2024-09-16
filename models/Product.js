@@ -88,17 +88,30 @@ productSchema.statics.deleteProductById = async function (productId) {
   }
 };
 
-productSchema.statics.editProduct = async function (productId, updatedData) {
+productSchema.statics.editProduct = async function (productId, productData) {
+  const { name, price, feature, description } = productData;
+  console.log(productData);
   try {
-    const updatedProduct = await this.findByIdAndUpdate(
-      productId,
-      updatedData,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    return updatedProduct;
+    const productToUpdate = await this.findById(productId);
+    if (!productToUpdate) {
+      throw new Error("product not found!");
+    }
+    if (name) {
+      productToUpdate.name = name;
+    }
+    if (price) {
+      productToUpdate.price = price;
+    }
+    if (feature) {
+      productToUpdate.features.push(feature);
+    }
+    if (description) {
+      productToUpdate.descriptions.push(description);
+    }
+
+    await productToUpdate.save();
+    console.log("saved");
+    return productToUpdate;
   } catch (error) {
     throw error;
   }

@@ -37,30 +37,19 @@ const editProduct = async (req, res) => {
     return res.status(400).json({ message: "Product ID required!" });
   }
 
-  const { name, price, descriptions, features } = req.body;
-  if (!name || !price || !descriptions || !features) {
-    return res.status(400).json({ message: "All fields required!" });
-  }
+  const { name, price, description, feature } = req.body;
 
   try {
-    const updatedProductData = {
+    const productData = {
       name,
       price,
-      descriptions,
-      features,
+      description,
+      feature,
     };
-
-    const updatedProduct = await Product.editProduct(
-      productId,
-      updatedProductData
-    );
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found!" });
-    }
+    await Product.editProduct(productId, productData);
 
     res.status(200).json({
       message: "Product updated successfully",
-      product: updatedProduct,
     });
   } catch (error) {
     console.error(error);
