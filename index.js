@@ -84,6 +84,7 @@ app.use("/transactions", require("./routes/user/transaction"));
 app.use("/order", require("./routes/user/order"));
 app.use("/chat", require("./routes/user/message"));
 app.use("/ticket", require("./routes/user/ticket"));
+app.use("/completed", require("./routes/user/completed"));
 
 // admin endpoints with auth
 app.use("/manageproducts", require("./routes/admin/prodAdmin"));

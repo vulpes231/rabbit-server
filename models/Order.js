@@ -20,10 +20,37 @@ const orderSchema = new Schema({
     type: String,
     default: "pending",
   },
+  customerName: {
+    type: String,
+  },
+  customerEmail: {
+    type: String,
+    required: true,
+  },
 });
 
-orderSchema.statics.getAllOrders = function () {
-  return this.find();
+const User = require("./User");
+const Completed = require("./Completed");
+
+orderSchema.statics.getAllOrders = async function () {
+  try {
+    const orders = await this.find();
+    return orders;
+  } catch (error) {
+    throw error;
+  }
+};
+
+orderSchema.statics.getOrderById = async function (orderId) {
+  try {
+    const order = await this.findById(orderId);
+    if (!order) {
+      throw new Error("Order not found!");
+    }
+    return order;
+  } catch (error) {
+    throw error;
+  }
 };
 
 orderSchema.statics.createOrder = async function (orderData, userId) {
@@ -74,37 +101,41 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
   }
 };
 
-orderSchema.statics.completeOrder = async function (orderId) {
+orderSchema.statics.completeOrder = async function (orderId, orderData) {
   try {
-    const getOrder = await this.findById(orderId);
-    if (!getOrder) {
+    const order = await Order.findById(orderId);
+    if (!order) {
       throw new Error("Order not found!");
     }
 
-    const User = require("./User");
+    const user = await User.findById(order.creator);
+    if (!user) {
+      throw new Error("User not found!");
+    }
 
-    const user = await User.findByIdAndUpdate(
-      getOrder.creator,
-      {
-        $inc: { pendingOrders: -1, completedOrders: 1 },
-        status: "completed",
-      },
-      { new: true }
-    );
+    const orderToComplete = {
+      detail: orderData.detail,
+      orderId: order._id,
+      customerId: user._id,
+    };
 
-    const order = await this.findByIdAndUpdate(
-      orderId,
-      { status: "completed" },
-      { new: true }
-    );
+    await Completed.create(orderToComplete);
+
+    user.pendingOrders = (user.pendingOrders || 0) - 1;
+    user.completedOrders = (user.completedOrders || 0) + 1;
+
+    await user.save();
+
+    order.status = "completed";
+    await order.save();
 
     return order;
   } catch (error) {
-    throw error;
+    console.error("Error completing order:", error);
+    throw new Error("Failed to complete the order. Please try again later.");
   }
 };
 
-// Static method to delete an order
 orderSchema.statics.deleteOrder = async function (orderId) {
   try {
     const deletedOrder = await this.findByIdAndDelete(orderId);

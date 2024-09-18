@@ -1,4 +1,5 @@
 const Order = require("../../models/Order");
+const User = require("../../models/User");
 
 const createOrder = async (req, res) => {
   const userId = req.userId;
@@ -10,8 +11,11 @@ const createOrder = async (req, res) => {
       .status(400)
       .json({ message: "Product name and price are required." });
   try {
+    const customer = await User.findById(userId);
     const orderData = {
       creator: userId,
+      customerName: customer.username,
+      customerEMail: customer.email,
       item,
       price,
     };
@@ -35,10 +39,9 @@ const createOrder = async (req, res) => {
 };
 
 const getUserOrders = async (req, res) => {
-  const userId = req.userId; // Assuming userId is extracted from authentication middleware
+  const userId = req.userId;
 
   try {
-    // Find orders for the user
     const userOrders = await Order.find({ creator: userId });
 
     res.status(200).json({ userOrders: userOrders });

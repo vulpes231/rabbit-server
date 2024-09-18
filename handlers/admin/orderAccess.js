@@ -5,7 +5,6 @@ const getAllOrders = async (req, res) => {
   if (!isAdmin) return res.status(403).json({ message: "forbidden access" });
   try {
     const orders = await Order.getAllOrders();
-
     res.status(200).json({ orders });
   } catch (error) {
     console.error("Error getting user orders:", error);
@@ -13,25 +12,44 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-const completeOrder = async (req, res) => {
-  const { orderId } = req.body;
+const getOrder = async (req, res) => {
+  const isAdmin = req.isAdmin;
+  if (!isAdmin) return res.status(403).json({ message: "forbidden access!" });
 
+  const { orderId } = req.params;
+  if (!orderId)
+    return res.status(403).json({ message: "orderId is required!" });
+  try {
+    const order = await Order.getOrderById(orderId);
+
+    res.status(200).json({ order });
+  } catch (error) {
+    console.error("Error getting order:", error);
+    res.status(500).json({ message: "An error occurred." });
+  }
+};
+
+const completeOrder = async (req, res) => {
   const isAdmin = req.isAdmin;
   if (!isAdmin) return res.status(403).json({ message: "forbidden access" });
 
+  const { orderId } = req.params;
+  const { orderDetails, attachment } = req.body;
+
+  if (!orderDetails)
+    return res.status(403).json({ message: "order detail is required" });
+
   try {
-    // Complete the order using the static method from the Order model
-    const completedOrder = await Order.completeOrder(orderId);
+    const orderData = {
+      detail: orderDetails,
+    };
 
-    if (!completedOrder) {
-      return res.status(404).json({ message: "Order not found." });
-    }
-
-    res.status(200).json({ order: completedOrder });
+    await Order.completeOrder(orderId, orderData);
+    res.status(200).json({ message: "order conmpleted" });
   } catch (error) {
     console.error("Error completing order:", error);
     res.status(500).json({ message: "An error occurred." });
   }
 };
 
-module.exports = { completeOrder, getAllOrders };
+module.exports = { completeOrder, getAllOrders, getOrder };
