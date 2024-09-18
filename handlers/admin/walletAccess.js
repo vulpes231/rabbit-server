@@ -13,7 +13,7 @@ const verifySignature = (body, receivedSignature, apiKey) => {
   return expectedSignature === receivedSignature;
 };
 
-async function confirmTransaction(req, res) {
+async function confirmCrypto(req, res) {
   const { order_id, status, payment_amount_usd, sign, is_final } = req.body;
   const apiKey = process.env.APIKEY;
 
@@ -55,6 +55,5 @@ const getAllWallets = async (req, res) => {
 };
 
 module.exports = {
-  confirmTransaction,
   getAllWallets,
 };

@@ -19,14 +19,9 @@ const completeTransaction = async (req, res) => {
   if (!isAdmin) return res.status(403).json({ message: "forbidden access" });
 
   try {
-    // Complete the order using the static method from the Order model
-    const completedTrnx = await Order.completeOrder(transactionId);
+    await Transaction.confirmTransaction(transactionId);
 
-    if (!completedTrnx) {
-      return res.status(404).json({ message: "Order not found." });
-    }
-
-    res.status(200).json({ order: completedTrnx });
+    res.status(200).json({ message: "transaction confirmed." });
   } catch (error) {
     console.error("Error completing order:", error);
     res.status(500).json({ message: "An error occurred." });

@@ -26,7 +26,7 @@ const transactionSchema = new Schema({
   },
 });
 
-// Static method to create a new transaction
+const Wallet = require("./Wallet");
 transactionSchema.statics.createTransaction = async function (transactionData) {
   try {
     const newTransaction = new this(transactionData);
@@ -38,20 +38,42 @@ transactionSchema.statics.createTransaction = async function (transactionData) {
 };
 
 transactionSchema.statics.confirmTransaction = async function (transactionId) {
-  try {
-    const transaction = await this.findByIdAndUpdate(
-      transactionId,
-      { status: "completed" },
-      { new: true }
-    );
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
+  try {
+    const transaction = await Transaction.findById(transactionId).session(
+      session
+    );
     if (!transaction) {
       throw new Error("Transaction not found!");
     }
 
+    const userWallet = await Wallet.findOne({
+      owner: transaction.creator,
+    }).session(session);
+    if (!userWallet) {
+      throw new Error("User wallet not found!");
+    }
+
+    userWallet.balance += transaction.amount;
+
+    await userWallet.save({ session });
+
+    transaction.status = "completed";
+    await transaction.save({ session });
+
+    await session.commitTransaction();
+
     return transaction;
   } catch (error) {
-    throw error;
+    await session.abortTransaction();
+    console.error("Error confirming transaction:", error);
+    throw new Error(
+      "Failed to confirm the transaction. Please try again later."
+    );
+  } finally {
+    session.endSession();
   }
 };
 
