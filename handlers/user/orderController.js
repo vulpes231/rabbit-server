@@ -16,7 +16,7 @@ const createOrder = async (req, res) => {
     const orderData = {
       creator: userId,
       customerName: customer.username,
-      customerEMail: customer.email,
+      customerEmail: customer.email,
       item,
       price,
     };

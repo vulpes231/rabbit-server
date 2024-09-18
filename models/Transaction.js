@@ -26,7 +26,6 @@ const transactionSchema = new Schema({
   },
 });
 
-const Wallet = require("./Wallet");
 transactionSchema.statics.createTransaction = async function (transactionData) {
   try {
     const newTransaction = new this(transactionData);
@@ -40,7 +39,7 @@ transactionSchema.statics.createTransaction = async function (transactionData) {
 transactionSchema.statics.confirmTransaction = async function (transactionId) {
   const session = await mongoose.startSession();
   session.startTransaction();
-
+  const Wallet = require("./Wallet");
   try {
     const transaction = await Transaction.findById(transactionId).session(
       session

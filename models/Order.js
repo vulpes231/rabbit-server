@@ -57,6 +57,8 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  // const {customerEmail, customerName, item, price} = orderData
+
   try {
     const opts = { session };
     const User = require("./User");
