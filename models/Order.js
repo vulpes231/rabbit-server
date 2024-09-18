@@ -61,32 +61,27 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
     const opts = { session };
     const User = require("./User");
     const Wallet = require("./Wallet");
-    // Check if user exists
+
     const user = await User.findById(userId).session(session);
     if (!user) {
       throw new Error("User not found!");
     }
 
-    // Get user wallet
     const userWallet = await Wallet.findOne({ owner: userId }).session(session);
     if (!userWallet) {
       throw new Error("Wallet not found!");
     }
 
-    // Check if user has sufficient balance
     if (userWallet.balance < orderData.price) {
       throw new Error("Insufficient balance!");
     }
 
-    // Deduct balance from user wallet
     userWallet.balance -= orderData.price;
     await userWallet.save(opts);
 
-    // Create new order and save it
     const newOrder = new this(orderData);
     await newOrder.save(opts);
 
-    // Update pendingOrders count for the user
     user.pendingOrders++;
     await user.save(opts);
 
@@ -97,18 +92,21 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    throw error; // Propagate the error to handle it in the controller
+    throw error;
   }
 };
 
 orderSchema.statics.completeOrder = async function (orderId, orderData) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).session(session);
     if (!order) {
       throw new Error("Order not found!");
     }
 
-    const user = await User.findById(order.creator);
+    const user = await User.findById(order.creator).session(session);
     if (!user) {
       throw new Error("User not found!");
     }
@@ -119,20 +117,24 @@ orderSchema.statics.completeOrder = async function (orderId, orderData) {
       customerId: user._id,
     };
 
-    await Completed.create(orderToComplete);
+    await Completed.create([orderToComplete], { session });
 
     user.pendingOrders = (user.pendingOrders || 0) - 1;
     user.completedOrders = (user.completedOrders || 0) + 1;
 
-    await user.save();
+    await user.save({ session });
 
     order.status = "completed";
-    await order.save();
+    await order.save({ session });
 
+    await session.commitTransaction();
     return order;
   } catch (error) {
+    await session.abortTransaction();
     console.error("Error completing order:", error);
     throw new Error("Failed to complete the order. Please try again later.");
+  } finally {
+    session.endSession();
   }
 };
 

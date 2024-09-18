@@ -10,6 +10,7 @@ const createOrder = async (req, res) => {
     return res
       .status(400)
       .json({ message: "Product name and price are required." });
+
   try {
     const customer = await User.findById(userId);
     const orderData = {
