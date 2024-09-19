@@ -30,6 +30,7 @@ completedSchema.statics.getCompletedOrders = async function () {
 };
 
 completedSchema.statics.getCompletedUserOrders = async function (userId) {
+  console.log(userId);
   try {
     const userCompletedOrders = await Completed.find({ customerId: userId });
     return userCompletedOrders;
