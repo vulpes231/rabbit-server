@@ -122,6 +122,13 @@ transactionSchema.statics.markPaid = async function (transactionId, hash) {
     if (!transaction) {
       throw new Error("transaction not found!");
     }
+
+    if (hash) {
+      transaction.transactionHash = hash;
+    }
+    transaction.paid = true;
+    await transaction.save();
+    return transaction;
   } catch (error) {
     console.log(error);
     throw error;

@@ -43,8 +43,22 @@ async function getUserTransactionbyId(req, res) {
   }
 }
 
+async function confirmPayment(req, res) {
+  const { transactionId } = req.params;
+  const { hash } = req.body;
+
+  try {
+    const transaction = await Transaction.markPaid(transactionId, hash);
+    res.status(200).json({ transaction });
+  } catch (error) {
+    console.error("Error marking paid", error);
+    res.status(500).json({ message: "An error occurred." });
+  }
+}
+
 module.exports = {
   createTransaction,
   getUserTransactions,
   getUserTransactionbyId,
+  confirmPayment,
 };
