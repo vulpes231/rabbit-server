@@ -42,7 +42,7 @@ const createWallet = async (currency, network, orderId, callbackUrl) => {
   }
 };
 
-const deposit = async (req, res) => {
+const depositAuto = async (req, res) => {
   const { currency, network, amount } = req.body;
   const userId = req.userId;
 
@@ -103,6 +103,25 @@ const deposit = async (req, res) => {
   }
 };
 
+const depositManually = async (req, res) => {
+  const userId = req.userId;
+  const { coinName, network, amount } = req.body;
+
+  if (!coinName || !network || !amount)
+    return res
+      .status(400)
+      .json({ message: "coinname, network, amount required!" });
+  try {
+    const depositData = { coinName, network, amount };
+
+    const transactiondata = await Wallet.depositManual(userId, depositData);
+    res.status(200).json({ transactiondata });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "an errror occured. try again later" });
+  }
+};
+
 const getUserBalance = async (req, res) => {
   const userId = req.userId;
 
@@ -127,5 +146,6 @@ const getUserBalance = async (req, res) => {
 
 module.exports = {
   getUserBalance,
-  deposit,
+  depositAuto,
+  depositManually,
 };

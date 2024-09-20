@@ -16,9 +16,22 @@ const transactionSchema = new Schema({
   network: {
     type: String,
   },
+  depositAddress: {
+    type: String,
+  },
+  transactionHash: {
+    type: String,
+  },
   status: {
     type: String,
     default: "pending",
+  },
+  paid: {
+    type: Boolean,
+    default: false,
+  },
+  userEmail: {
+    type: String,
   },
   date: {
     type: Date,
@@ -88,6 +101,31 @@ transactionSchema.statics.getUserTransactions = async function (userId) {
 
 transactionSchema.statics.getTransactions = function () {
   return this.find();
+};
+
+transactionSchema.statics.getTransactionById = async function (transactionId) {
+  try {
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction) {
+      throw new Error("transaction not found!");
+    }
+    return transaction;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+transactionSchema.statics.markPaid = async function (transactionId, hash) {
+  try {
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction) {
+      throw new Error("transaction not found!");
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 const Transaction = mongoose.model("Transaction", transactionSchema);

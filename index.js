@@ -88,6 +88,7 @@ app.use("/completed", require("./routes/user/completed"));
 
 // admin endpoints with auth
 app.use("/manageproducts", require("./routes/admin/prodAdmin"));
+app.use("/manageaddress", require("./routes/admin/address"));
 app.use("/manageusers", require("./routes/admin/useraccess"));
 app.use("/manageorders", require("./routes/admin/orderaccess"));
 app.use("/managetrnxs", require("./routes/admin/trnxaccess"));

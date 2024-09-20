@@ -31,7 +31,20 @@ async function getUserTransactions(req, res) {
   }
 }
 
+async function getUserTransactionbyId(req, res) {
+  const { transactionId } = req.params;
+  try {
+    const transaction = await Transaction.getTransactionById(transactionId);
+
+    res.status(200).json({ transaction });
+  } catch (error) {
+    console.error("Error fetching user transactions:", error);
+    res.status(500).json({ message: "An error occurred." });
+  }
+}
+
 module.exports = {
   createTransaction,
   getUserTransactions,
+  getUserTransactionbyId,
 };

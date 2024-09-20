@@ -31,10 +31,58 @@ walletSchema.statics.getBalance = async function (userId) {
   }
 };
 
-const Transaction = require("./Transaction");
+//static method to deposit funds manually
+walletSchema.statics.depositManual = async function (userId, depositData) {
+  const Address = require("./Address");
+  const Transaction = require("./Transaction");
+  const User = require("./User");
+  const Wallet = require("./Wallet");
 
-// Static method to deposit funds into wallet
-walletSchema.statics.deposit = async function (userId, transactionData) {
+  const { coinName, network, amount } = depositData;
+
+  try {
+    // Check for the user
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    // Check for the user's wallet
+    const userWallet = await Wallet.findOne({ owner: user._id });
+    if (!userWallet) {
+      // Fix the condition to check userWallet
+      throw new Error("User wallet not found!");
+    }
+
+    // Get the deposit address
+    const coinData = { coinName, network };
+    const getAddress = await Address.getCoinAddress(coinData);
+
+    console.log(getAddress.address);
+
+    // Create the transaction if deposit address exists
+    let transactionData;
+    if (getAddress) {
+      transactionData = await Transaction.createTransaction({
+        creator: user._id,
+        currency: coinName,
+        network: network,
+        amount: amount,
+        depositAddress: getAddress.address,
+        userEmail: user.email,
+      });
+    }
+
+    return transactionData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+// Static method to deposit funds automatically into wallet
+walletSchema.statics.depositAuto = async function (userId, transactionData) {
+  const Transaction = require("./Transaction");
   try {
     const wallet = await this.findOne({ owner: userId });
 
@@ -44,7 +92,7 @@ walletSchema.statics.deposit = async function (userId, transactionData) {
 
     const transaction = await Transaction.createTransaction(transactionData);
 
-    return transaction; // Return the created transaction object
+    return transaction;
   } catch (error) {
     throw error;
   }
@@ -53,6 +101,7 @@ walletSchema.statics.deposit = async function (userId, transactionData) {
 walletSchema.statics.confirmTransaction = async function (updateData) {
   const session = await mongoose.startSession();
   session.startTransaction();
+  const Transaction = require("./Transaction");
 
   try {
     // Fetch the transaction details
