@@ -3,7 +3,7 @@ const User = require("../../models/User");
 
 const createOrder = async (req, res) => {
   const userId = req.userId;
-  const { item, price } = req.body;
+  const { item, price, quantity, note } = req.body;
   console.log(req.body);
 
   if (!item || price == undefined)
@@ -17,6 +17,8 @@ const createOrder = async (req, res) => {
       creator: userId,
       customerName: customer.username,
       customerEmail: customer.email,
+      qty: quantity || "",
+      note,
       item,
       price,
     };

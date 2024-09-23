@@ -23,6 +23,12 @@ const orderSchema = new Schema({
   customerName: {
     type: String,
   },
+  qty: {
+    type: String,
+  },
+  note: {
+    type: String,
+  },
   customerEmail: {
     type: String,
     required: true,
@@ -57,7 +63,7 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  // const {customerEmail, customerName, item, price} = orderData
+  const { price, qty } = orderData;
 
   try {
     const opts = { session };
@@ -74,11 +80,15 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
       throw new Error("Wallet not found!");
     }
 
-    if (userWallet.balance < orderData.price) {
+    // Handle quantity, defaulting to 1 if not provided
+    const orderQty = qty && qty > 0 ? parseFloat(qty) : 1;
+    const totalCost = orderQty * price;
+
+    if (userWallet.balance < totalCost) {
       throw new Error("Insufficient balance!");
     }
 
-    userWallet.balance -= orderData.price;
+    userWallet.balance -= totalCost;
     await userWallet.save(opts);
 
     const newOrder = new this(orderData);
@@ -88,13 +98,12 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
     await user.save(opts);
 
     await session.commitTransaction();
-    session.endSession();
-
     return newOrder;
   } catch (error) {
     await session.abortTransaction();
-    session.endSession();
     throw error;
+  } finally {
+    session.endSession();
   }
 };
 
