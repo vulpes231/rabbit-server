@@ -51,5 +51,18 @@ addressSchema.statics.getAllAddress = async function () {
   }
 };
 
+//static method to update address
+addressSchema.statics.updateAddress = async function (coinId, address) {
+  try {
+    const coin = await Address.findById(coinId);
+    coin.address = address;
+    await coin.save();
+    return coin;
+  } catch (error) {
+    console.error(error);
+    throw new Error("cannot update address. try again.");
+  }
+};
+
 const Address = mongoose.model("Address", addressSchema);
 module.exports = Address;

@@ -52,4 +52,25 @@ const getWallets = async (req, res) => {
   }
 };
 
-module.exports = { generateWalletAddress, createCoinWallet, getWallets };
+const updateWalletAddress = async (req, res) => {
+  const { coinId } = req.params;
+  const { address } = req.body;
+
+  console.log(coinId);
+  try {
+    const walletAddress = await Address.updateAddress(coinId, address);
+    res.status(200).json({ message: "wallet address updated" });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "an error occured while updating address" });
+  }
+};
+
+module.exports = {
+  generateWalletAddress,
+  createCoinWallet,
+  getWallets,
+  updateWalletAddress,
+};
