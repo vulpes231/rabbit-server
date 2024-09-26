@@ -22,6 +22,9 @@ const transactionSchema = new Schema({
   transactionHash: {
     type: String,
   },
+  paymentUrl: {
+    type: String,
+  },
   status: {
     type: String,
     default: "pending",

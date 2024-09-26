@@ -133,9 +133,9 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
       },
     });
 
-    console.log(createInvoice.data); // Log the relevant data
+    console.log(createInvoice.data.invoice_url);
 
-    return createInvoice.data; // Return the data you need
+    return createInvoice.data.invoice_url; // Return the data you need
   } catch (error) {
     console.error("Error in depositAuto:", error);
     throw error; // Optionally, you could customize the error further

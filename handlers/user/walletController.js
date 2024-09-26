@@ -12,8 +12,8 @@ const depositAuto = async (req, res) => {
 
   try {
     const depositData = { coinName, network, amount };
-    const createInvoice = await Wallet.depositAuto(userId, depositData);
-    res.status(200).json({ message: "invoice created", createInvoice });
+    const invoiceUrl = await Wallet.depositAuto(userId, depositData);
+    res.status(200).json({ message: "invoice created", invoiceUrl });
   } catch (error) {
     console.error("Error depositing funds:", error);
     res
