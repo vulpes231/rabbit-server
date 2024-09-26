@@ -99,7 +99,7 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
       currency: coinName,
       network: network,
       amount: amount,
-      depositAddress: "auto plisio",
+      depositAddress: "auto",
       userEmail: user.email,
     });
 
