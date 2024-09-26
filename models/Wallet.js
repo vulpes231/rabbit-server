@@ -110,10 +110,17 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
       source_currency: "USD",
       source_amount: amount,
       order_number: transactionData._id,
-      currency: coinName === "bitcoin" ? "BTC" : coinName,
+      currency:
+        coinName === "bitcoin"
+          ? "BTC"
+          : coinName === "ethereum"
+          ? "ETH"
+          : coinName === "tether"
+          ? "USDT"
+          : coinName,
       email: user.email,
       order_name: `${coinName}-${user.username}`,
-      callback_url: `${serverUrl}/callback`,
+      callback_url: `${serverUrl}/callback/?json=true`,
       api_key: apiKey,
     };
 
@@ -135,16 +142,50 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
   }
 };
 
-walletSchema.statics.confirmTransaction = async function (transactionId) {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+walletSchema.statics.confirmTransaction = async function (orderData) {
   const Transaction = require("./Transaction");
+  const session = await Transaction.startSession();
+  session.startTransaction();
+  const crypto = require("crypto");
 
   try {
-    // Fetch the transaction details
-    const transaction = await Transaction.findById(
-      updateData.transactionId
-    ).session(session);
+    const {
+      txn_id,
+      ipn_type,
+      merchant,
+      merchant_id,
+      amount,
+      currency,
+      order_number,
+      order_name,
+      confirmations,
+      status,
+      verify_hash,
+      source_currency,
+      source_amount,
+      source_rate,
+      comment,
+      invoice_commission,
+      invoice_sum,
+      invoice_total_sum,
+    } = orderData;
+
+    // Verify the hash
+    const secretKey = process.env.PLISIO_API_KEY;
+    const hashData = `${txn_id}${ipn_type}${merchant}${merchant_id}${amount}${currency}${order_number}${order_name}${confirmations}${status}${source_currency}${source_amount}${source_rate}${comment}${invoice_commission}${invoice_sum}${invoice_total_sum}`;
+    const expectedHash = crypto
+      .createHmac("sha256", secretKey)
+      .update(hashData)
+      .digest("hex");
+
+    if (expectedHash !== verify_hash) {
+      throw new Error("Invalid hash signature.");
+    }
+
+    // Fetch the transaction details using order_number
+    const transaction = await Transaction.findById(order_number).session(
+      session
+    );
     if (!transaction) {
       throw new Error("Transaction not found!");
     }
@@ -157,31 +198,33 @@ walletSchema.statics.confirmTransaction = async function (transactionId) {
       throw new Error("Wallet of transaction creator not found!");
     }
 
-    if (updateData.paid) {
+    // Process based on the status
+    if (status === "completed") {
       // Increase the balance of the wallet
-      wallet.balance += updateData.amount;
+      wallet.balance += transaction.amount;
       await wallet.save({ session });
 
       // Update the transaction status
       transaction.status = "completed";
       await transaction.save({ session });
-    } else {
-      // Handle other status updates if necessary
-      transaction.status = updateData.status;
+    } else if (status === "error") {
+      transaction.status = "failed";
+      await transaction.save({ session });
+    } else if (status === "cancelled") {
+      transaction.status = "cancelled";
       await transaction.save({ session });
     }
 
     // Commit the transaction
     await session.commitTransaction();
-    session.endSession();
-
-    return wallet;
+    res.status(200).send("Transaction processed successfully");
   } catch (error) {
     // Rollback the transaction if any error occurs
     await session.abortTransaction();
+    console.error("Transaction confirmation error:", error);
+    res.status(500).send("Error processing transaction");
+  } finally {
     session.endSession();
-
-    throw error;
   }
 };
 

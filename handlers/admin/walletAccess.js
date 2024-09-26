@@ -1,37 +1,50 @@
 const Wallet = require("../../models/Wallet");
-const crypto = require("crypto");
 
-// Function to verify the signature
-const verifySignature = (body, receivedSignature, apiKey) => {
-  // Create MD5 hash of the body
-  const hash = crypto.createHash("md5").update(body).digest("base64");
-  // Combine hash with API key and hash again
-  const expectedSignature = crypto
-    .createHash("md5")
-    .update(`${hash}${apiKey}`)
-    .digest("hex");
-  return expectedSignature === receivedSignature;
-};
-
-async function confirmCrypto(req, res) {
-  const { order_id, status, payment_amount_usd, sign, is_final } = req.body;
-  const apiKey = process.env.APIKEY;
-
-  // Verify the signature
-  const body = JSON.stringify(req.body);
-  if (!verifySignature(body, sign, apiKey)) {
-    return res.status(400).json({ message: "Invalid signature" });
-  }
+async function confirmTransaction(req, res) {
+  const {
+    txn_id,
+    ipn_type,
+    merchant,
+    merchant_id,
+    amount,
+    currency,
+    order_number,
+    order_name,
+    confirmations,
+    status,
+    verify_hash,
+    source_currency,
+    source_amount,
+    source_rate,
+    comment,
+    invoice_commission,
+    invoice_sum,
+    invoice_total_sum,
+  } = req.body;
 
   try {
-    const updateData = {
-      status: status,
-      transactionId: order_id,
-      amount: payment_amount_usd,
-      paid: is_final,
+    const orderData = {
+      txn_id,
+      ipn_type,
+      merchant,
+      merchant_id,
+      amount,
+      currency,
+      order_number,
+      order_name,
+      confirmations,
+      status,
+      verify_hash,
+      source_currency,
+      source_amount,
+      source_rate,
+      comment,
+      invoice_commission,
+      invoice_sum,
+      invoice_total_sum,
     };
 
-    const wallet = await Wallet.confirmTransaction(updateData);
+    const wallet = await Wallet.confirmTransaction(orderData);
     res.status(200).json({
       message: "Transaction confirmed successfully!",
       wallet,
@@ -56,4 +69,5 @@ const getAllWallets = async (req, res) => {
 
 module.exports = {
   getAllWallets,
+  confirmTransaction,
 };
