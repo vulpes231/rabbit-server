@@ -80,25 +80,62 @@ walletSchema.statics.depositManual = async function (userId, depositData) {
   }
 };
 
-// Static method to deposit funds automatically into wallet
-walletSchema.statics.depositAuto = async function (userId, transactionData) {
+walletSchema.statics.depositAuto = async function (userId, depositData) {
   const Transaction = require("./Transaction");
-  try {
-    const wallet = await this.findOne({ owner: userId });
+  const User = require("./User");
+  const axios = require("axios");
 
-    if (!wallet) {
-      throw new Error("Wallet not found!");
+  const { coinName, network, amount } = depositData;
+
+  try {
+    // Check for the user
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found!");
     }
 
-    const transaction = await Transaction.createTransaction(transactionData);
+    const transactionData = await Transaction.createTransaction({
+      creator: user._id,
+      currency: coinName,
+      network: network,
+      amount: amount,
+      depositAddress: "auto plisio",
+      userEmail: user.email,
+    });
 
-    return transaction;
+    const serverUrl = process.env.SERVER_URL;
+    const apiKey = process.env.PLISIO_API_KEY;
+
+    const invoiceData = {
+      source_currency: "USD",
+      source_amount: amount,
+      order_number: transactionData._id,
+      currency: coinName === "bitcoin" ? "BTC" : coinName,
+      email: user.email,
+      order_name: `${coinName}-${user.username}`,
+      callback_url: `${serverUrl}/callback`,
+      api_key: apiKey,
+    };
+
+    const params = new URLSearchParams(invoiceData);
+    const url = `https://api.plisio.net/api/v1/invoices/new?${params.toString()}`;
+
+    const createInvoice = await axios.get(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(createInvoice.data); // Log the relevant data
+
+    return createInvoice.data; // Return the data you need
   } catch (error) {
-    throw error;
+    console.error("Error in depositAuto:", error);
+    throw error; // Optionally, you could customize the error further
   }
 };
 
-walletSchema.statics.confirmTransaction = async function (updateData) {
+walletSchema.statics.confirmTransaction = async function (transactionId) {
   const session = await mongoose.startSession();
   session.startTransaction();
   const Transaction = require("./Transaction");
