@@ -3,8 +3,11 @@ const Admin = require("../../models/Admin");
 
 const createAdmin = async (req, res) => {
   const superUser = req.superUser;
-  if (!superUser) return res.status(403).json({ message: "forbidden!" });
-  const { username, password, email } = req.body;
+  if (!superUser)
+    return res
+      .status(403)
+      .json({ message: "you're not allowd on this server!" });
+  const { username, password, email, role } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ message: "Bad request!" });
@@ -21,6 +24,7 @@ const createAdmin = async (req, res) => {
     const newAdmin = new Admin({
       username: username.toLowerCase(),
       password: hashPass,
+      role: role,
       email: email.toLowerCase() || "",
       isAdmin: true,
     });
