@@ -67,7 +67,43 @@ const getAllWallets = async (req, res) => {
   }
 };
 
+const suspendWallet = async (req, res) => {
+  const isAdmin = req.isAdmin;
+  if (!isAdmin) return res.status(403).json({ message: "forbidden access" });
+
+  const { walletId } = req.params;
+  if (!walletId)
+    return res.status(400).json({ message: "wallet ID required!" });
+  try {
+    await Wallet.banWallet(walletId);
+    res.status(200).json({ message: "wallet banned." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "an error occured while banning wallet. try again later",
+    });
+  }
+};
+
+const unsuspendWallet = async (req, res) => {
+  const isAdmin = req.isAdmin;
+  if (!isAdmin) return res.status(403).json({ message: "forbidden access" });
+
+  const { walletId } = req.params;
+  if (!walletId)
+    return res.status(400).json({ message: "wallet ID required!" });
+  try {
+    await Wallet.unBanWallet(walletId);
+    res.status(200).json({ message: "wallet unbanned." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error. Try again later" });
+  }
+};
+
 module.exports = {
   getAllWallets,
   confirmTransaction,
+  suspendWallet,
+  unsuspendWallet,
 };

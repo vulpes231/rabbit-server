@@ -251,7 +251,7 @@ walletSchema.statics.banWallet = async function (walletId) {
   }
 };
 
-walletSchema.statics.unBanWallet = async function () {
+walletSchema.statics.unBanWallet = async function (walletId) {
   try {
     const wallet = await Wallet.findById(walletId);
     wallet.suspended = false;
