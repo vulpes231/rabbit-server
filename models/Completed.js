@@ -17,6 +17,9 @@ const completedSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  customerName: {
+    type: String,
+  },
 });
 
 completedSchema.statics.getCompletedOrders = async function () {

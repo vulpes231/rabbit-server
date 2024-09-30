@@ -80,6 +80,10 @@ orderSchema.statics.createOrder = async function (orderData, userId) {
       throw new Error("Wallet not found!");
     }
 
+    if (userWallet.suspended) {
+      throw new Error("wallet banned! contact admin");
+    }
+
     // Handle quantity, defaulting to 1 if not provided
     const orderQty = qty && qty > 0 ? parseFloat(qty) : 1;
     const totalCost = orderQty * price;
@@ -126,6 +130,7 @@ orderSchema.statics.completeOrder = async function (orderId, orderData) {
       detail: orderData.detail,
       orderId: order._id,
       customerId: user._id,
+      customerName: user.username,
     };
 
     await Completed.create([orderToComplete], { session });

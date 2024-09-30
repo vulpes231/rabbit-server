@@ -12,6 +12,13 @@ const walletSchema = new Schema({
     ref: "User",
     required: true,
   },
+  ownerEmail: {
+    type: String,
+  },
+  suspended: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 walletSchema.statics.getAllWallets = function () {
@@ -92,6 +99,12 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
     const user = await User.findById(userId);
     if (!user) {
       throw new Error("User not found!");
+    }
+
+    const userWallet = await Wallet.findById(user._id);
+
+    if (userWallet.suspended) {
+      throw new Error("wallet banned! contact admin");
     }
 
     const transactionData = await Transaction.createTransaction({
@@ -223,6 +236,30 @@ walletSchema.statics.confirmTransaction = async function (orderData) {
     res.status(500).send("Error processing transaction");
   } finally {
     session.endSession();
+  }
+};
+
+walletSchema.statics.banWallet = async function (walletId) {
+  try {
+    const wallet = await Wallet.findById(walletId);
+    wallet.suspended = true;
+    await wallet.save();
+    return wallet;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+walletSchema.statics.unBanWallet = async function () {
+  try {
+    const wallet = await Wallet.findById(walletId);
+    wallet.suspended = false;
+    await wallet.save();
+    return wallet;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
 

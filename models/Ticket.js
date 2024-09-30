@@ -7,7 +7,7 @@ const ticketSchema = new Schema({
   },
   status: {
     type: String,
-    default: "open", // default status
+    default: "open",
   },
   orderId: {
     type: String,
@@ -15,7 +15,7 @@ const ticketSchema = new Schema({
   messages: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Message", // Reference to Message schema
+      ref: "Message",
     },
   ],
 });

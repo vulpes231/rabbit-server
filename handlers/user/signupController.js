@@ -11,21 +11,26 @@ const signupUser = async (req, res) => {
   try {
     const user = await User.findOne({ username: member });
     if (user)
-      return res.status(409).json({ message: "Username already taken" });
+      return res.status(409).json({ message: "username already taken" });
+
+    if (mail === user.email) {
+      return res.status(409).json({ message: "email already taken" });
+    }
 
     const hashedPass = await bcrypt.hash(pass, 10);
 
     // Create the new user
     const newUser = await User.create({
-      username: member,
+      username: member.toLowerCase(),
       password: hashedPass,
-      email: mail,
+      email: mail.toLowerCase(),
     });
 
     // Create a wallet for the new user
     const newWallet = await Wallet.create({
       balance: 0,
       owner: newUser._id,
+      ownerEmail: newUser.email,
     });
 
     res
