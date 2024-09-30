@@ -24,4 +24,13 @@ const adminSchema = new Schema({
   },
 });
 
+adminSchema.statics.getAllAdmin = async function () {
+  try {
+    const admins = await this.find();
+    return admins;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = mongoose.model("Admin", adminSchema);
