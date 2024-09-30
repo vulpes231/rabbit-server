@@ -13,10 +13,6 @@ const signupUser = async (req, res) => {
     if (user)
       return res.status(409).json({ message: "username already taken" });
 
-    if (mail === user.email) {
-      return res.status(409).json({ message: "email already taken" });
-    }
-
     const hashedPass = await bcrypt.hash(pass, 10);
 
     // Create the new user
