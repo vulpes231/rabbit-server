@@ -25,6 +25,7 @@ const signinAdmin = async (req, res) => {
       {
         admin: admin.username,
         isAdmin: admin.isAdmin,
+        superUser: admin.superUser,
       },
       process.env.ACCESS_TOKEN,
       { expiresIn: "1d" }
@@ -32,6 +33,8 @@ const signinAdmin = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         admin: admin.username,
+        isAdmin: admin.isAdmin,
+        superUser: admin.superUser,
       },
       process.env.REFRESH_TOKEN,
       { expiresIn: "1d" }

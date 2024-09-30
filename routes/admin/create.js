@@ -1,7 +1,7 @@
 const express = require("express");
-const { signupAdmin } = require("../../handlers/admin/adminSignup");
+const { createAdmin } = require("../../handlers/admin/adminSignup");
 const router = express.Router();
 
-router.route("/").post(signupAdmin);
+router.route("/").post(createAdmin);
 
 module.exports = router;

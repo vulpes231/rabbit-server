@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
 
 // admin endpoints without auth
 app.use("/login", require("./routes/admin/login"));
-app.use("/enroll", require("./routes/admin/create"));
+
 // user endpoints wihtout auth
 app.use("/signin", require("./routes/user/signin"));
 app.use("/signup", require("./routes/user/signup"));
@@ -97,6 +97,7 @@ app.use("/managechat", require("./routes/admin/chat"));
 app.use("/manageticket", require("./routes/admin/ticket"));
 app.use("/managelogout", require("./routes/admin/managelogout"));
 app.use("/callback", require("./routes/admin/confirm"));
+app.use("/enroll", require("./routes/admin/create"));
 
 app.use(errorLogger);
 

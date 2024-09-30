@@ -1,10 +1,12 @@
 const bcrypt = require("bcryptjs");
 const Admin = require("../../models/Admin");
 
-const signupAdmin = async (req, res) => {
+const createAdmin = async (req, res) => {
+  const superUser = req.isSuperUser;
+  if (!superUser) return res.status(403).json({ message: "forbidden!" });
   const { username, password, email } = req.body;
 
-  if (!username || !password || !email) {
+  if (!username || !password) {
     return res.status(400).json({ message: "Bad request!" });
   }
 
@@ -17,9 +19,9 @@ const signupAdmin = async (req, res) => {
     const hashPass = await bcrypt.hash(password, 10);
 
     const newAdmin = new Admin({
-      username: username,
+      username: username.toLowerCase(),
       password: hashPass,
-      email: email,
+      email: email.toLowerCase() || "",
       isAdmin: true,
     });
 
@@ -34,4 +36,4 @@ const signupAdmin = async (req, res) => {
   }
 };
 
-module.exports = { signupAdmin };
+module.exports = { createAdmin };
