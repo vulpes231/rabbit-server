@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const Admin = require("../../models/Admin");
 
 const createAdmin = async (req, res) => {
-  const superUser = req.isSuperUser;
+  const superUser = req.superUser;
   if (!superUser) return res.status(403).json({ message: "forbidden!" });
   const { username, password, email } = req.body;
 
