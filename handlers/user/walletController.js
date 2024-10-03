@@ -13,13 +13,11 @@ const depositAuto = async (req, res) => {
   try {
     const depositData = { coinName, network, amount };
     const invoiceUrl = await Wallet.depositAuto(userId, depositData);
-    console.log(invoiceUrl);
+    // console.log(invoiceUrl);
     res.status(200).json({ message: "invoice created", invoiceUrl });
   } catch (error) {
     console.error("Error depositing funds:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while creating invoice." });
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -101,7 +101,7 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
       throw new Error("User not found!");
     }
 
-    const userWallet = await Wallet.findById(user._id);
+    const userWallet = await Wallet.findOne({ owner: user._id });
 
     if (userWallet.suspended) {
       throw new Error("wallet banned! contact admin");
@@ -149,7 +149,7 @@ walletSchema.statics.depositAuto = async function (userId, depositData) {
     return createInvoice.data;
   } catch (error) {
     console.error("Error in depositAuto:", error);
-    throw error; // Optionally, you could customize the error further
+    throw error;
   }
 };
 
