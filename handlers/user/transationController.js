@@ -43,7 +43,7 @@ async function getUserTransactionbyId(req, res) {
   }
 }
 
-async function confirmPayment(req, res) {
+async function markTrnxPaid(req, res) {
   const { transactionId } = req.params;
   const { hash } = req.body;
 
@@ -60,5 +60,5 @@ module.exports = {
   createTransaction,
   getUserTransactions,
   getUserTransactionbyId,
-  confirmPayment,
+  markTrnxPaid,
 };

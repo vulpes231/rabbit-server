@@ -15,6 +15,8 @@ const getAllTrnx = async (req, res) => {
 const completeTransaction = async (req, res) => {
   const { transactionId } = req.body;
 
+  // console.log(transactionId);
+
   const isAdmin = req.isAdmin;
   if (!isAdmin) return res.status(403).json({ message: "forbidden access" });
 
